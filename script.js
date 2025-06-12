@@ -51,7 +51,7 @@ function addItemToDOM(text, checked = false) {
   list.appendChild(li);
 }
 
-input.addEventListener("keypress", e => {
+input.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     const value = input.value.trim();
     if (value) {
