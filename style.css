@@ -44,10 +44,14 @@ table#dieta th, table#dieta td {
   padding: 1rem;
   text-align: center;
 }
-
 table#dieta td.hoy {
   background-color: #ffe58f;
   font-weight: bold;
+  transition: background 0.3s;
+}
+
+table#dieta td {
+  cursor: pointer;
 }
 
 
