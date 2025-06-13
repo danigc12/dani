@@ -27,3 +27,9 @@ nav button {
 main#app {
   padding: 1rem;
 }
+
+.item-text.checked {
+  text-decoration: line-through;
+  color: #999;
+}
+
