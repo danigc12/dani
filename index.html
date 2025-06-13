@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lista de la Compra</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi App SPA</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>🛒 Lista de la Compra</h1>
-    <input type="text" id="itemInput" placeholder="Añadir producto..." autocomplete="off" />
-    <ul id="shoppingList"></ul>
-  </div>
+  <nav>
+    <button onclick="navigate('lista')">🛒 Lista de la compra</button>
+    <!-- Más botones aquí -->
+  </nav>
 
-  <!-- Conexión con script.js como módulo -->
-  <script type="module" src="script.js"></script>
+  <main id="app">
+    <p>Selecciona una opción del menú</p>
+  </main>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>
