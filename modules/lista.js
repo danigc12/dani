@@ -65,45 +65,45 @@ export function init() {
   }
 
   function renderItem(id, data) {
-        const li = document.createElement("li");
+      const li = document.createElement("li");
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = data.checked;
-        checkbox.addEventListener("change", () => {
-            span.classList.toggle("checked", checkbox.checked);
-            updateItem(id, checkbox.checked);
-        });
+      const span = document.createElement("span");
+      span.className = "item-text";
+      span.textContent = data.text;
+      if (data.checked) span.classList.add("checked");
 
-        const span = document.createElement("span");
-        span.className = "item-text";
-        span.textContent = data.text;
-        if (data.checked) span.classList.add("checked");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = data.checked;
+      checkbox.addEventListener("change", () => {
+        span.classList.toggle("checked", checkbox.checked);
+        updateItem(id, checkbox.checked);
+      });
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.className = "delete-btn";
-        deleteBtn.textContent = "❌";
-        deleteBtn.onclick = () => deleteItem(id);
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-btn";
+      deleteBtn.textContent = "❌";
+      deleteBtn.onclick = () => deleteItem(id);
 
-        const content = document.createElement("div");
-        content.style.display = "flex";
-        content.style.alignItems = "center";
-        content.style.justifyContent = "space-between";
-        content.style.width = "100%";
+      const leftPart = document.createElement("div");
+      leftPart.style.display = "flex";
+      leftPart.style.alignItems = "center";
+      leftPart.style.gap = "0.5rem";
+      leftPart.appendChild(checkbox);
+      leftPart.appendChild(span);
 
-        const leftPart = document.createElement("div");
-        leftPart.style.display = "flex";
-        leftPart.style.alignItems = "center";
-        leftPart.appendChild(checkbox);
-        leftPart.appendChild(span);
+      const content = document.createElement("div");
+      content.style.display = "flex";
+      content.style.alignItems = "center";
+      content.style.justifyContent = "space-between";
+      content.style.width = "100%";
+      content.appendChild(leftPart);
+      content.appendChild(deleteBtn);
 
-        content.appendChild(leftPart);
-        content.appendChild(deleteBtn);
+      li.appendChild(content);
+      li.id = id;
+      list.appendChild(li);
+  }
 
-        li.appendChild(content);
-        li.id = id;
-
-        list.appendChild(li);
-    }
 
 }
