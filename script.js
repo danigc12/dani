@@ -1,44 +1,61 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import { getDatabase, ref, set, push, onChildAdded, onChildChanged, onChildRemoved, update, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDGOcsBPRahcBvQFd1ojtjM7GDf5z60h0g",
+  authDomain: "lista-de-la-compra-ca0b3.firebaseapp.com",
+  databaseURL: "https://lista-de-la-compra-ca0b3-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lista-de-la-compra-ca0b3",
+  storageBucket: "lista-de-la-compra-ca0b3.firebasestorage.app",
+  messagingSenderId: "578424079603",
+  appId: "1:578424079603:web:b02306aff56ce27b436386",
+  measurementId: "G-VN5BEWGMRK"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const dbRef = ref(db, "shoppingList");
+
 const list = document.getElementById("shoppingList");
 const input = document.getElementById("itemInput");
 
-function saveList() {
-  const items = [...list.children].map(li => {
-    return {
-      text: li.querySelector(".item-text").textContent,
-      checked: li.querySelector("input[type='checkbox']").checked
-    };
-  });
-  localStorage.setItem("listaCompra", JSON.stringify(items));
+function addItem(text, checked = false, id = null) {
+  const itemId = id || push(dbRef).key;
+  const itemRef = ref(db, `shoppingList/${itemId}`);
+  set(itemRef, { text, checked });
+  input.value = "";
 }
 
-function loadList() {
-  const saved = JSON.parse(localStorage.getItem("listaCompra") || "[]");
-  saved.forEach(item => addItemToDOM(item.text, item.checked));
+function updateItem(id, checked) {
+  const itemRef = ref(db, `shoppingList/${id}`);
+  update(itemRef, { checked });
 }
 
-function addItemToDOM(text, checked = false) {
+function deleteItem(id) {
+  const itemRef = ref(db, `shoppingList/${id}`);
+  remove(itemRef);
+}
+
+function renderItem(id, data) {
   const li = document.createElement("li");
 
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
-  checkbox.checked = checked;
+  checkbox.checked = data.checked;
   checkbox.addEventListener("change", () => {
     span.classList.toggle("checked", checkbox.checked);
-    saveList();
+    updateItem(id, checkbox.checked);
   });
 
   const span = document.createElement("span");
   span.className = "item-text";
-  span.textContent = text;
-  if (checked) span.classList.add("checked");
+  span.textContent = data.text;
+  if (data.checked) span.classList.add("checked");
 
   const deleteBtn = document.createElement("button");
   deleteBtn.className = "delete-btn";
   deleteBtn.textContent = "❌";
-  deleteBtn.onclick = () => {
-    li.remove();
-    saveList();
-  };
+  deleteBtn.onclick = () => deleteItem(id);
 
   const btnContainer = document.createElement("div");
   btnContainer.className = "buttons";
@@ -47,6 +64,7 @@ function addItemToDOM(text, checked = false) {
   li.appendChild(checkbox);
   li.appendChild(span);
   li.appendChild(btnContainer);
+  li.id = id;
 
   list.appendChild(li);
 }
@@ -54,12 +72,26 @@ function addItemToDOM(text, checked = false) {
 input.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     const value = input.value.trim();
-    if (value) {
-      addItemToDOM(value);
-      saveList();
-      input.value = "";
-    }
+    if (value) addItem(value);
   }
 });
 
-loadList();
+onChildAdded(dbRef, (snapshot) => {
+  renderItem(snapshot.key, snapshot.val());
+});
+
+onChildChanged(dbRef, (snapshot) => {
+  const li = document.getElementById(snapshot.key);
+  if (li) {
+    const checkbox = li.querySelector("input[type='checkbox']");
+    const span = li.querySelector(".item-text");
+
+    checkbox.checked = snapshot.val().checked;
+    span.classList.toggle("checked", snapshot.val().checked);
+  }
+});
+
+onChildRemoved(dbRef, (snapshot) => {
+  const li = document.getElementById(snapshot.key);
+  if (li) li.remove();
+});
