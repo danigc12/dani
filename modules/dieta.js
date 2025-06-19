@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+import { getDatabase, ref, set, get, update, onValue, push } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDGOcsBPRahcBvQFd1ojtjM7GDf5z60h0g",
@@ -13,13 +13,15 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
-const dbRef = ref(db, "dieta");
+
+const dbDieta = ref(db, "dieta");
+const dbRecetas = ref(db, "recetas");
 
 export function init() {
   const table = document.getElementById("dieta");
 
-  // Resalta el día actual
-  const day = new Date().getDay(); // 1 = lunes ... 5 = viernes
+  // Resaltar día actual
+  const day = new Date().getDay();
   if (day >= 1 && day <= 5) {
     const colIndex = day - 1;
     for (let row of table.rows) {
@@ -28,27 +30,59 @@ export function init() {
     }
   }
 
-  // Cargar datos desde Firebase
-  onValue(dbRef, (snapshot) => {
+  // Actualizar tabla con datos
+  onValue(dbDieta, snapshot => {
     const data = snapshot.val();
     document.querySelectorAll("#dieta td").forEach(cell => {
       const dia = cell.dataset.dia;
       const tipo = cell.dataset.tipo;
-      const valor = data?.[dia]?.[tipo] || "🍽️";
-      cell.textContent = valor;
+      cell.textContent = data?.[dia]?.[tipo] || "🍽️";
     });
   });
 
-  // Editar celdas
+  // Click en celda: mostrar editor y recetas
   document.querySelectorAll("#dieta td").forEach(cell => {
     cell.addEventListener("click", () => {
       const dia = cell.dataset.dia;
       const tipo = cell.dataset.tipo;
-      const nuevo = prompt(`Nuevo valor para ${tipo} de ${dia}:`, cell.textContent);
-      if (nuevo !== null) {
-        const celdaRef = ref(db, `dieta/${dia}/${tipo}`);
-        set(celdaRef, nuevo);
-      }
+      const valor = cell.textContent;
+
+      document.getElementById("detalle-comida").style.display = "block";
+      document.getElementById("detalle-titulo").textContent = `🍽️ ${tipo.toUpperCase()} de ${dia.charAt(0).toUpperCase() + dia.slice(1)}`;
+      document.getElementById("input-dieta").value = valor;
+
+      document.getElementById("guardar-dieta").onclick = () => {
+        const nuevo = document.getElementById("input-dieta").value;
+        if (nuevo) {
+          set(ref(db, `dieta/${dia}/${tipo}`), nuevo);
+        }
+      };
+
+      // Cargar recetas relacionadas
+      const recetasRef = ref(db, `recetas/${dia}/${tipo}`);
+      onValue(recetasRef, snapshot => {
+        const lista = document.getElementById("lista-recetas");
+        lista.innerHTML = "";
+        const recetas = snapshot.val() || [];
+        recetas.forEach(r => {
+          const li = document.createElement("li");
+          li.textContent = r;
+          lista.appendChild(li);
+        });
+      });
+
+      // Agregar nueva receta
+      document.getElementById("agregar-receta").onclick = () => {
+        const nueva = document.getElementById("nueva-receta").value.trim();
+        if (!nueva) return;
+        const recetasRef = ref(db, `recetas/${dia}/${tipo}`);
+        get(recetasRef).then(snapshot => {
+          const actuales = snapshot.val() || [];
+          actuales.push(nueva);
+          set(recetasRef, actuales);
+          document.getElementById("nueva-receta").value = "";
+        });
+      };
     });
   });
 }

@@ -58,12 +58,34 @@ table#dieta td.hoy {
   transition: background 0.3s;
 }
 
+table#dieta th {
+  background-color: #d0e8ff;  /* azul clarito */
+  color: #000;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+
+
 @media (max-width: 600px) {
   table#dieta th, table#dieta td {
     padding: 0.5rem;
     font-size: 0.9rem;
   }
 }
+#detalle-comida input[type="text"] {
+  padding: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+#detalle-comida ul {
+  padding-left: 1rem;
+}
+#detalle-comida li {
+  margin-bottom: 0.3rem;
+}
+
+
 
 
 
