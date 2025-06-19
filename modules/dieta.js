@@ -1,5 +1,5 @@
-import { getDatabase, ref, get, set, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDGOcsBPRahcBvQFd1ojtjM7GDf5z60h0g",
@@ -11,7 +11,7 @@ const firebaseConfig = {
   appId: "1:578424079603:web:b02306aff56ce27b436386"
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 const dbRef = ref(db, "dieta");
 
@@ -28,7 +28,7 @@ export function init() {
     }
   }
 
-  // Cargar dieta desde Firebase
+  // Cargar datos desde Firebase
   onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     document.querySelectorAll("#dieta td").forEach(cell => {
@@ -39,7 +39,7 @@ export function init() {
     });
   });
 
-  // Hacer celdas editables
+  // Editar celdas
   document.querySelectorAll("#dieta td").forEach(cell => {
     cell.addEventListener("click", () => {
       const dia = cell.dataset.dia;

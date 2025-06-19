@@ -1,6 +1,7 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
 import { getDatabase, ref, set, push, onChildAdded, onChildChanged, onChildRemoved, update, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDGOcsBPRahcBvQFd1ojtjM7GDf5z60h0g",
   authDomain: "lista-de-la-compra-ca0b3.firebaseapp.com",
@@ -8,11 +9,11 @@ const firebaseConfig = {
   projectId: "lista-de-la-compra-ca0b3",
   storageBucket: "lista-de-la-compra-ca0b3.firebasestorage.app",
   messagingSenderId: "578424079603",
-  appId: "1:578424079603:web:b02306aff56ce27b436386",
-  measurementId: "G-VN5BEWGMRK"
+  appId: "1:578424079603:web:b02306aff56ce27b436386"
 };
 
-const app = initializeApp(firebaseConfig);
+// Solo inicializa una vez
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getDatabase(app);
 const dbRef = ref(db, "shoppingList");
 
@@ -65,45 +66,43 @@ export function init() {
   }
 
   function renderItem(id, data) {
-      const li = document.createElement("li");
+    const li = document.createElement("li");
 
-      const span = document.createElement("span");
-      span.className = "item-text";
-      span.textContent = data.text;
-      if (data.checked) span.classList.add("checked");
+    const span = document.createElement("span");
+    span.className = "item-text";
+    span.textContent = data.text;
+    if (data.checked) span.classList.add("checked");
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = data.checked;
-      checkbox.addEventListener("change", () => {
-        span.classList.toggle("checked", checkbox.checked);
-        updateItem(id, checkbox.checked);
-      });
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = data.checked;
+    checkbox.addEventListener("change", () => {
+      span.classList.toggle("checked", checkbox.checked);
+      updateItem(id, checkbox.checked);
+    });
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.className = "delete-btn";
-      deleteBtn.textContent = "❌";
-      deleteBtn.onclick = () => deleteItem(id);
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "❌";
+    deleteBtn.onclick = () => deleteItem(id);
 
-      const leftPart = document.createElement("div");
-      leftPart.style.display = "flex";
-      leftPart.style.alignItems = "center";
-      leftPart.style.gap = "0.5rem";
-      leftPart.appendChild(checkbox);
-      leftPart.appendChild(span);
+    const leftPart = document.createElement("div");
+    leftPart.style.display = "flex";
+    leftPart.style.alignItems = "center";
+    leftPart.style.gap = "0.5rem";
+    leftPart.appendChild(checkbox);
+    leftPart.appendChild(span);
 
-      const content = document.createElement("div");
-      content.style.display = "flex";
-      content.style.alignItems = "center";
-      content.style.justifyContent = "space-between";
-      content.style.width = "100%";
-      content.appendChild(leftPart);
-      content.appendChild(deleteBtn);
+    const content = document.createElement("div");
+    content.style.display = "flex";
+    content.style.alignItems = "center";
+    content.style.justifyContent = "space-between";
+    content.style.width = "100%";
+    content.appendChild(leftPart);
+    content.appendChild(deleteBtn);
 
-      li.appendChild(content);
-      li.id = id;
-      list.appendChild(li);
+    li.appendChild(content);
+    li.id = id;
+    list.appendChild(li);
   }
-
-
 }
